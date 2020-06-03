@@ -1,4 +1,4 @@
-package com.example.demo.controller;
+package com.example.demo;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
