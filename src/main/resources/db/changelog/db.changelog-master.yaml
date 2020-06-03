@@ -1,0 +1,163 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: hieulai
+      changes:
+        - createTable:
+            tableName: user
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: created_on
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_on
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: username
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: facebook_id
+                  type: varchar(255)
+              - column:
+                  name: type
+                  type: varchar(255)
+              - column:
+                  name: client_secret
+                  type: varchar(255)
+  - changeSet:
+      id: 2
+      author: hieulai
+      changes:
+        - createTable:
+            tableName: publisher
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: created_on
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_on
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: username
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: facebook_id
+                  type: varchar(255)
+              - column:
+                  name: type
+                  type: varchar(255)
+              - column:
+                  name: client_secret
+                  type: varchar(255)
+  - changeSet:
+      id: 3
+      author: hieulai
+      changes:
+        - createTable:
+            tableName: user_publisher
+            columns:
+              - column:
+                  name: user_id
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: publisher_id
+                  type: int
+                  constraints:
+                    nullable: false
+        -  addForeignKeyConstraint:
+             constraintName:  fk_user_publisher
+             baseColumnNames:  user_id
+             baseTableName:  user_publisher
+             referencedColumnNames:  id
+             referencedTableName:  user
+        -  addForeignKeyConstraint:
+             constraintName:  fk_pubsliher_user
+             baseColumnNames:  publisher_id
+             baseTableName:  user_publisher
+             referencedColumnNames:  id
+             referencedTableName:  publisher
+  - changeSet:
+      id: 4
+      author: hieulai
+      changes:
+        - createTable:
+            tableName: api
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: created_on
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_on
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: publisher_id
+                  type: int
+                  constraints:
+                    nullable: false
+        -  addForeignKeyConstraint:
+             constraintName:  fk_api_publisher
+             baseColumnNames:  publisher_id
+             baseTableName:  api
+             referencedColumnNames:  id
+             referencedTableName:  publisher
+  - changeSet:
+      id: 5
+      author: hieulai
+      changes:
+        - addColumn:
+            tableName: api
+            columns:
+              - column:
+                  name: doc
+                  type: text
