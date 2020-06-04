@@ -14,7 +14,7 @@ public class Api extends BaseEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, unique = true)
+    @Column(name = "id")
     private Integer id;
 
     @Column(name = "name", nullable = false)
