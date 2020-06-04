@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 5
+      author: hieulai
+      changes:
+        - addColumn:
+            tableName: api
+            columns:
+              - column:
+                  name: doc
+                  type: text

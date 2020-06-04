@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: 3
+      author: hieulai
+      changes:
+        - createTable:
+            tableName: user_publisher
+            columns:
+              - column:
+                  name: user_id
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: publisher_id
+                  type: int
+                  constraints:
+                    nullable: false
+        -  addForeignKeyConstraint:
+             constraintName:  fk_user_publisher
+             baseColumnNames:  user_id
+             baseTableName:  user_publisher
+             referencedColumnNames:  id
+             referencedTableName:  user
+        -  addForeignKeyConstraint:
+             constraintName:  fk_pubsliher_user
+             baseColumnNames:  publisher_id
+             baseTableName:  user_publisher
+             referencedColumnNames:  id
+             referencedTableName:  publisher

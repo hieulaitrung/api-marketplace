@@ -18,7 +18,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/webjars/**",
                 "/csrf",
                 "/",
-                "/health"
+                "/health",
+                // TODO: remove
+                "/apis/**"
         );
     }
 

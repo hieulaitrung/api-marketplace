@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: 4
+      author: hieulai
+      changes:
+        - createTable:
+            tableName: api
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: created_on
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_on
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: publisher_id
+                  type: int
+                  constraints:
+                    nullable: false
+        -  addForeignKeyConstraint:
+             constraintName:  fk_api_publisher
+             baseColumnNames:  publisher_id
+             baseTableName:  api
+             referencedColumnNames:  id
+             referencedTableName:  publisher

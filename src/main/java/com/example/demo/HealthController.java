@@ -12,6 +12,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class HealthController {
     @RequestMapping(method = RequestMethod.GET, value = "")
     public ResponseEntity<Object> healthCheck(){
-        return new ResponseEntity<>("OK", new HttpHeaders(), HttpStatus.OK);
+        return new ResponseEntity<>("{\"status\" :\"OK\"}", new HttpHeaders(), HttpStatus.OK);
     }
 }

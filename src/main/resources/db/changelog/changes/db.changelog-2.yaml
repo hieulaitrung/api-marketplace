@@ -1,0 +1,31 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: hieulai
+      changes:
+        - createTable:
+            tableName: publisher
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: created_on
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_on
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+              - column:
+                  name: business_type
+                  type: varchar(255)
