@@ -1,20 +1,24 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.ApiRequestDTO;
+import com.example.demo.document.ApiDocument;
 import com.example.demo.dto.ApiDTO;
+import com.example.demo.dto.ApiQueryDTO;
+import com.example.demo.dto.ApiRequestDTO;
 import com.example.demo.entity.Api;
 import com.example.demo.mapper.ApiMapper;
 import com.example.demo.service.ApiService;
-import io.swagger.annotations.*;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/apis")
@@ -25,6 +29,19 @@ public class ApiController {
 
     @Autowired
     private ApiService service;
+
+    @RequestMapping(method = RequestMethod.GET, value = "")
+    @ApiOperation("Return Api information")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Get Apis successfully", response = ApiDTO.class)})
+    public ResponseEntity<ApiQueryDTO> getApis(@RequestParam(value = "id", required = false) Integer id,
+                                               @RequestParam(value = "page", defaultValue = "0", required = false) Integer page,
+                                               @RequestParam(value = "size", defaultValue = "10", required = false) Integer size) {
+
+        ApiQueryDTO dto = mapper.mapToDto(service.getAll(id, page, size));
+        dto.setPage(page);
+        dto.setSize(size);
+        return new ResponseEntity<>(dto, new HttpHeaders(), HttpStatus.OK);
+    }
     
     @RequestMapping(method = RequestMethod.GET, value = "/{id}")
     @ApiOperation("Return Api information by id")

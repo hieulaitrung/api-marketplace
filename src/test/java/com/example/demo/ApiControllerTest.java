@@ -1,27 +1,34 @@
 package com.example.demo;
 
 import com.example.demo.constant.BusinessType;
+import com.example.demo.document.ApiDocument;
+import com.example.demo.document.ApiPublisher;
 import com.example.demo.dto.ApiRequestDTO;
 import com.example.demo.entity.Api;
 import com.example.demo.entity.Publisher;
 import com.example.demo.repository.ApiRepository;
 import com.example.demo.repository.PublisherRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.document.Document;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.ResourceUtils;
+import org.testcontainers.shaded.org.apache.commons.io.FileUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isA;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -29,7 +36,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = DemoApplication.class)
 @AutoConfigureMockMvc
-@TestPropertySource(properties = "testing=true")
 public class ApiControllerTest {
     @Autowired
     private MockMvc mvc;
@@ -37,12 +43,15 @@ public class ApiControllerTest {
     @Autowired
     private PublisherRepository publisherRepository;
 
+    @Autowired
+    private ApiRepository apiRepository;
+
+    @Autowired
+    private ElasticsearchOperations operations;
+
     private Publisher publisher;
 
     private Api api;
-
-    @Autowired
-    private ApiRepository apiRepository;
 
     final static ObjectMapper MAPPER = new ObjectMapper();
 
@@ -51,7 +60,9 @@ public class ApiControllerTest {
     }
 
     @Before
-    public void setUp() {
+    public void setUp() throws IOException, InterruptedException {
+        prepareIndex();
+
         publisher = new Publisher();
         publisher.setName("Publisher");
         publisher.setBusinessType(BusinessType.PUBLIC);
@@ -67,6 +78,33 @@ public class ApiControllerTest {
         api.setUpdatedOn(new Date());
         api.setPublisher(publisher);
         api = apiRepository.save(api);
+
+        ApiDocument apiDocument = new ApiDocument();
+        apiDocument.setId(api.getId());
+        apiDocument.setName(api.getName());
+        apiDocument.setDescription(api.getDescription());
+        apiDocument.setDoc(api.getDoc());
+        apiDocument.setPublisher(ApiPublisher.builder()
+                .businessType(api.getPublisher().getBusinessType().toString())
+                .build());
+        operations.save(apiDocument);
+        operations.indexOps(ApiDocument.class).refresh();
+    }
+
+    private void prepareIndex() throws IOException {
+        String esMapping = "classpath:es/api_mapping.json";
+        File file = ResourceUtils.getFile(esMapping);
+        String mapping = FileUtils.readFileToString(file, "UTF-8");
+
+        operations.indexOps(ApiDocument.class).create();
+        operations.indexOps(ApiDocument.class).putMapping(Document.parse(mapping));
+    }
+
+    @After
+    public void tearDown(){
+        apiRepository.deleteAll();
+        publisherRepository.deleteAll();
+        operations.indexOps(ApiDocument.class).delete();
     }
 
     @Test
@@ -96,6 +134,18 @@ public class ApiControllerTest {
                 .andExpect(jsonPath("$.id", is(api.getId())))
                 .andExpect(jsonPath("$.name", is(api.getName())))
                 .andExpect(jsonPath("$.publisherId", is(publisher.getId())));
+    }
+
+    @Test
+    public void givenNothing_whenGetAPIs_thenStatus200() throws Exception {
+        mvc.perform(get("/apis?id={id}", api.getId())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total", is(1)))
+                .andExpect(jsonPath("$.apis").isArray())
+                .andExpect(jsonPath("$.apis", hasSize(1)))
+                .andExpect(jsonPath("$.apis[0].id", is(api.getId())));
     }
 
     @Test

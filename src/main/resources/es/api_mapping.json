@@ -1,0 +1,27 @@
+{
+  "properties": {
+    "apiId": {
+      "type": "integer"
+    },
+    "name": {
+      "type": "keyword"
+    },
+    "description": {
+      "type": "keyword"
+    },
+    "doc": {
+      "type": "keyword"
+    },
+    "publisherId": {
+      "type": "keyword"
+    },
+    "publisher": {
+      "type": "nested",
+      "properties": {
+        "businessType": {
+          "type": "keyword"
+        }
+      }
+    }
+  }
+}

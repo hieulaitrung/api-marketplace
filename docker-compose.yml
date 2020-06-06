@@ -30,7 +30,7 @@ services:
       - 6379:6379
 
   elasticsearch:
-    image: elasticsearch:7.1.1
+    image: elasticsearch:7.7.1
     ports:
       - "9200:9200"
       - "9300:9300"
