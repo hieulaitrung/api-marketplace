@@ -1,4 +1,4 @@
-package com.example.demo.document;
+package com.example.demo.elasticsearch;
 
 import lombok.Builder;
 import lombok.Getter;

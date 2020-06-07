@@ -1,6 +1,6 @@
 package com.example.demo.mapper;
 
-import com.example.demo.document.ApiDocument;
+import com.example.demo.elasticsearch.ApiDocument;
 import com.example.demo.dto.ApiDTO;
 import com.example.demo.dto.ApiQueryDTO;
 import com.example.demo.entity.Api;

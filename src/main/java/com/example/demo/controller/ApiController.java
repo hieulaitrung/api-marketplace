@@ -1,6 +1,5 @@
 package com.example.demo.controller;
 
-import com.example.demo.document.ApiDocument;
 import com.example.demo.dto.ApiDTO;
 import com.example.demo.dto.ApiQueryDTO;
 import com.example.demo.dto.ApiRequestDTO;
@@ -17,9 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Controller
 @RequestMapping("/apis")
 public class ApiController {
@@ -33,11 +29,12 @@ public class ApiController {
     @RequestMapping(method = RequestMethod.GET, value = "")
     @ApiOperation("Return Api information")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Get Apis successfully", response = ApiDTO.class)})
-    public ResponseEntity<ApiQueryDTO> getApis(@RequestParam(value = "id", required = false) Integer id,
+    public ResponseEntity<ApiQueryDTO> getApis(@RequestParam(value = "publisherIds", required = false) String publisherIds,
+                                               @RequestParam(value = "term", required = false) String term,
                                                @RequestParam(value = "page", defaultValue = "0", required = false) Integer page,
                                                @RequestParam(value = "size", defaultValue = "10", required = false) Integer size) {
 
-        ApiQueryDTO dto = mapper.mapToDto(service.getAll(id, page, size));
+        ApiQueryDTO dto = mapper.mapToDto(service.getAll(publisherIds, term, page, size));
         dto.setPage(page);
         dto.setSize(size);
         return new ResponseEntity<>(dto, new HttpHeaders(), HttpStatus.OK);

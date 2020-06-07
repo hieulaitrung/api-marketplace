@@ -1,4 +1,4 @@
-package com.example.demo.document;
+package com.example.demo.elasticsearch;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

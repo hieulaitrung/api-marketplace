@@ -1,8 +1,8 @@
 package com.example.demo;
 
 import com.example.demo.constant.BusinessType;
-import com.example.demo.document.ApiDocument;
-import com.example.demo.document.ApiPublisher;
+import com.example.demo.elasticsearch.ApiDocument;
+import com.example.demo.elasticsearch.ApiPublisher;
 import com.example.demo.dto.ApiRequestDTO;
 import com.example.demo.entity.Api;
 import com.example.demo.entity.Publisher;
@@ -26,6 +26,7 @@ import org.testcontainers.shaded.org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import static org.hamcrest.Matchers.*;
@@ -94,7 +95,7 @@ public class ApiControllerTest {
     private void prepareIndex() throws IOException {
         String esMapping = "classpath:es/api_mapping.json";
         File file = ResourceUtils.getFile(esMapping);
-        String mapping = FileUtils.readFileToString(file, "UTF-8");
+        String mapping = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
 
         operations.indexOps(ApiDocument.class).create();
         operations.indexOps(ApiDocument.class).putMapping(Document.parse(mapping));
@@ -138,7 +139,7 @@ public class ApiControllerTest {
 
     @Test
     public void givenNothing_whenGetAPIs_thenStatus200() throws Exception {
-        mvc.perform(get("/apis?id={id}", api.getId())
+        mvc.perform(get("/apis", api.getId())
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())

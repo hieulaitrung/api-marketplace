@@ -4,13 +4,13 @@
       "type": "integer"
     },
     "name": {
-      "type": "keyword"
+      "type": "text"
     },
     "description": {
-      "type": "keyword"
+      "type": "text"
     },
     "doc": {
-      "type": "keyword"
+      "type": "text"
     },
     "publisherId": {
       "type": "keyword"

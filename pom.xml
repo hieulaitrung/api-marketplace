@@ -17,8 +17,11 @@
 	<properties>
 		<java.version>1.8</java.version>
 		<spring-fox.version>2.9.2</spring-fox.version>
+		<spring.cloud.version>2.2.2.RELEASE</spring.cloud.version>
 		<lombok.version>1.18.12</lombok.version>
-		<testcontainers.version>1.14.3</testcontainers.version>
+		<testcontainers.version>1.43</testcontainers.version>
+		<jedis.version>jedis</jedis.version>
+		<common-lang3.version>3.10</common-lang3.version>
 	</properties>
 
 	<dependencies>
@@ -70,9 +73,20 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>${common-lang3.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+			<version>${jedis.version}</version>
+			<type>jar</type>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
@@ -82,19 +96,19 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter</artifactId>
-			<version>2.2.2.RELEASE</version>
+			<version>${spring.cloud.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.playtika.testcontainers</groupId>
 			<artifactId>embedded-postgresql</artifactId>
-			<version>1.43</version>
+			<version>${testcontainers.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.playtika.testcontainers</groupId>
 			<artifactId>embedded-elasticsearch</artifactId>
-			<version>1.43</version>
+			<version>${testcontainers.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
