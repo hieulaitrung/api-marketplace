@@ -4,12 +4,15 @@ services:
     build: .
     ports:
       - 8080:8080
+    depends_on:
+      - db
+      - redis
+      - elasticsearch
     environment:
       ENV: dev
       JDBC_URL: jdbc:postgresql://db:5432/api_marketplace
       JDBC_USER: postgres
       JDBC_PASSWORD: example
-
 
   db:
     build: docker/images/postgres

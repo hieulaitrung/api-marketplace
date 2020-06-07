@@ -44,7 +44,8 @@ public class ApiController {
     @ApiOperation("Return Api information by id")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Get Api successfully", response = ApiDTO.class)})
     public ResponseEntity<ApiDTO> getApi(@PathVariable(value = "id") Integer id) {
-        ApiDTO dto = mapper.mapToDto(service.get(id));
+        Api api = service.get(id);
+        ApiDTO dto = mapper.mapToDto(api);
         return new ResponseEntity<>(dto, new HttpHeaders(), HttpStatus.OK);
     }
 

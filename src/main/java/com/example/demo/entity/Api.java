@@ -2,15 +2,23 @@ package com.example.demo.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+import org.springframework.data.redis.core.RedisHash;
 
 import javax.persistence.*;
 import java.io.Serializable;
+
+import static com.example.demo.constant.CacheName.API;
 
 @Entity
 @Getter
 @Setter
 @Table(name = "api")
+@ToString
+@RedisHash(API)
 public class Api extends BaseEntity implements Serializable {
+
+    static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

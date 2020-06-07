@@ -1,8 +1,11 @@
 package com.example.demo.entity;
 
 import com.example.demo.constant.BusinessType;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+import org.springframework.data.redis.core.RedisHash;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -11,7 +14,11 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Table(name = "publisher")
+@ToString
+@RedisHash("publisher")
 public class Publisher extends BaseEntity implements Serializable {
+
+    static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

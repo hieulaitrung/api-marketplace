@@ -11,6 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
@@ -21,6 +24,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import static com.example.demo.constant.CacheName.API;
 import static org.elasticsearch.index.query.QueryBuilders.*;
 
 @Service
@@ -56,11 +60,13 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
+    @Cacheable(value = API, key = "#id", unless = "#result == null")
     public Api get(Integer id) {
-        return apiRepository.getOne(id);
+        return apiRepository.findById(id).get();
     }
 
     @Override
+    @CachePut(value = API, key = "#result.id")
     public Api create(ApiRequestDTO dto) {
         Api api = new Api();
         api.setName(dto.getName());
@@ -68,7 +74,7 @@ public class ApiServiceImpl implements ApiService {
         api.setDoc(dto.getDoc());
         api.setCreatedOn(new Date());
         api.setUpdatedOn(new Date());
-        api.setPublisher(publisherRepository.getOne(dto.getPublisherId()));
+        api.setPublisher(publisherRepository.findById(dto.getPublisherId()).get());
         api = apiRepository.save(api);
 
         ApiDocument apiDocument = new ApiDocument();
@@ -85,13 +91,14 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
+    @CachePut(value = API, key = "#id")
     public Api update(Integer id, ApiRequestDTO dto) {
         Api api = get(id);
         api.setName(dto.getName());
         api.setDescription(dto.getDescription());
         api.setDoc(dto.getDoc());
         api.setUpdatedOn(new Date());
-        api.setPublisher(publisherRepository.getOne(dto.getPublisherId()));
+        api.setPublisher(publisherRepository.findById(dto.getPublisherId()).get());
         api = apiRepository.save(api);
 
         ApiDocument apiDocument = new ApiDocument();
@@ -108,6 +115,7 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
+    @CacheEvict(value = API, allEntries=true)
     public void delete(Integer id) {
         apiRepository.deleteById(id);
         operations.delete(id.toString(), ApiDocument.class);
