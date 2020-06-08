@@ -28,7 +28,7 @@ services:
       - 18080:8080
 
   redis:
-    image: redis:alpine
+    image: redis:6-alpine
     ports:
       - 6379:6379
 
