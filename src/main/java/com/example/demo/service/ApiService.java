@@ -1,13 +1,14 @@
 package com.example.demo.service;
 
-import com.example.demo.elasticsearch.ApiDocument;
+import com.example.demo.dto.ApiQueryDTO;
 import com.example.demo.dto.ApiRequestDTO;
 import com.example.demo.entity.Api;
-import org.springframework.data.elasticsearch.core.SearchHits;
+
+
 
 public interface ApiService {
 
-    SearchHits<ApiDocument> getAll(String id, String term, Integer page, Integer size);
+    ApiQueryDTO queryDTO(String id, String term, Integer page, Integer size);
 
     Api get(Integer id);
 

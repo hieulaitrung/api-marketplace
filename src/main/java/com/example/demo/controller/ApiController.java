@@ -34,9 +34,7 @@ public class ApiController {
                                                @RequestParam(value = "page", defaultValue = "0", required = false) Integer page,
                                                @RequestParam(value = "size", defaultValue = "10", required = false) Integer size) {
 
-        ApiQueryDTO dto = mapper.mapToDto(service.getAll(publisherIds, term, page, size));
-        dto.setPage(page);
-        dto.setSize(size);
+        ApiQueryDTO dto = service.queryDTO(publisherIds, term, page, size);
         return new ResponseEntity<>(dto, new HttpHeaders(), HttpStatus.OK);
     }
     

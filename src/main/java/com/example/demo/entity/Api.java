@@ -38,5 +38,4 @@ public class Api extends BaseEntity implements Serializable {
     @JoinColumn(name = "publisher_id")
     private Publisher publisher;
 
-
 }

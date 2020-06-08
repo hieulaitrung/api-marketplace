@@ -32,7 +32,7 @@ public class ApiMapper {
         return dto;
     }
 
-    public ApiDTO mapToDto(ApiDocument apiDocument) {
+    private ApiDTO mapToDto(ApiDocument apiDocument) {
         ApiDTO dto = new ApiDTO();
         dto.setId(apiDocument.getId());
         dto.setName(apiDocument.getName());

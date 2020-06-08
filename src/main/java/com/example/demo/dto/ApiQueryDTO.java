@@ -11,8 +11,6 @@ import java.util.List;
 public class ApiQueryDTO {
 
     private Long total;
-    private Integer page;
-    private Integer size;
 
     @JsonProperty("apis")
     private List<ApiDTO> apiDTOS;
