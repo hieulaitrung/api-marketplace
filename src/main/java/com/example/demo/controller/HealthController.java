@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.controller;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class HealthController {
     @RequestMapping(method = RequestMethod.GET, value = "")
     public ResponseEntity<Object> healthCheck(){
+        //SecurityContext context = SecurityContextHolder.getContext();
+        //User userDetails =  (User) context.getAuthentication().getPrincipal();
         return new ResponseEntity<>("{\"status\" :\"OK\"}", new HttpHeaders(), HttpStatus.OK);
     }
 }
