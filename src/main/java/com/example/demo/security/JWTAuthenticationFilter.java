@@ -8,23 +8,25 @@ import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.filter.DelegatingFilterProxy;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
-public class JWTAuthenticationFilter extends DelegatingFilterProxy {
+public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
     private static String PREFIX = "Bearer ";
 
@@ -38,21 +40,20 @@ public class JWTAuthenticationFilter extends DelegatingFilterProxy {
     private String jwtPublicKey;
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse,
-                         FilterChain filterChain)
+    public void doFilterInternal(HttpServletRequest servletRequest, HttpServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
         try {
-            Authentication authentication = getAuthentication((HttpServletRequest) servletRequest);
+            Authentication authentication = getAuthentication(servletRequest);
             SecurityContextHolder.getContext().setAuthentication(authentication);
             filterChain.doFilter(servletRequest, servletResponse);
         } catch (ExpiredJwtException eje) {
-            ((HttpServletResponse) servletResponse).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            ((HttpServletResponse) servletResponse).setHeader("Content-Type", "application/json");
-            ((HttpServletResponse) servletResponse).getWriter().print(mapper.writeValueAsString(ApiError.valueOf(ErrorInfo.TOKEN_EXPIRED)));
+            servletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            servletResponse.setHeader("Content-Type", "application/json");
+            servletResponse.getWriter().print(mapper.writeValueAsString(ApiError.valueOf(ErrorInfo.TOKEN_EXPIRED)));
         } catch (Exception eje) {
-            ((HttpServletResponse) servletResponse).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            ((HttpServletResponse) servletResponse).setHeader("Content-Type", "application/json");
-            ((HttpServletResponse) servletResponse).getWriter().print(mapper.writeValueAsString(ApiError.valueOf(ErrorInfo.PROTOCOL_UNAUTHORIZED)));
+            servletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            servletResponse.setHeader("Content-Type", "application/json");
+            servletResponse.getWriter().print(mapper.writeValueAsString(ApiError.valueOf(ErrorInfo.PROTOCOL_UNAUTHORIZED)));
         }
 }
 
@@ -64,17 +65,19 @@ public class JWTAuthenticationFilter extends DelegatingFilterProxy {
             AccessTokenParser accessTokenParser = new AccessTokenParser(jwtPublicKey);
             Claims claims = accessTokenParser.getClaims(token.replace(PREFIX, ""));
 
-            if (claims != null) {
-                User userDetails = new User();
-                userDetails.setUserId(claims.getSubject());
-                String publisherIds = claims.get("publishers", String.class);
-                Optional.ofNullable(publisherIds).ifPresent(p -> userDetails.setPublisherIds(Arrays.asList(p.split(" "))));
-                String scope = claims.get("scope", String.class);
-                Optional.ofNullable(scope).ifPresent(s -> userDetails.setPermissions(Arrays.asList(s.split(" "))));
-                authentication = new UsernamePasswordAuthenticationToken(userDetails, null, Collections.emptyList());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
+            User user = new User();
+            user.setUserId(claims.getSubject());
+            String publisherIds = claims.get("publishers", String.class);
+            Optional.ofNullable(publisherIds).ifPresent(p -> user.setPublisherIds(Arrays.asList(p.split(" "))));
+            String scope = claims.get("scope", String.class);
+            Set<GrantedAuthority> authorities = new HashSet<>();
+            Optional.ofNullable(scope)
+                    .map(s -> Arrays.asList(s.split(" ")))
+                    .map(l -> authorities.addAll(l.stream().map(s -> "SCOPE_" + s).map(SimpleGrantedAuthority::new).collect(Collectors.toList())));
 
+            authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         return authentication;
     }

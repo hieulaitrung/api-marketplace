@@ -7,6 +7,7 @@ import lombok.Setter;
 public enum ErrorInfo {
 
     PROTOCOL_UNAUTHORIZED("TOKEN_INVALID", "Token is invalid"),
+    TOKEN_UNAUTHORIZED("TOKEN_UNAUTHORIZED", "Token is unauthorized to perform action"),
     TOKEN_EXPIRED("TOKEN_EXPIRED", "Token is expired");
 
     private ErrorInfo(String errorCode, String message) {
