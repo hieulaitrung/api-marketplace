@@ -14,7 +14,6 @@ import static com.example.demo.constant.CacheName.API;
 @Getter
 @Setter
 @Table(name = "api")
-@ToString
 @RedisHash(API)
 public class Api extends BaseEntity implements Serializable {
 
@@ -34,7 +33,7 @@ public class Api extends BaseEntity implements Serializable {
     @Column(name = "doc")
     private String doc;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "publisher_id")
     private Publisher publisher;
 

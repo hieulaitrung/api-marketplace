@@ -5,7 +5,7 @@ const jwt  = require('jsonwebtoken');
 // PAYLOAD
 var payload = {
  email: "hieulaitrung@gmail.com",
- scope: "users apis publisher",
+ scope: "api",
  publishers: "1 5"
 };
 // PRIVATE and PUBLIC key
@@ -19,7 +19,7 @@ var signOptions = {
  issuer:  i,
  subject:  s,
  audience:  a,
- expiresIn:  "1s",
+ expiresIn:  "12h",
  algorithm:  "RS256"
 };
 

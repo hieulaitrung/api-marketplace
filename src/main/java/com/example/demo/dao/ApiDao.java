@@ -70,17 +70,21 @@ public class ApiDao implements GenericDao<Api, Integer> {
         operations.delete(id.toString(), ApiDocument.class);
     }
 
-    public ApiQueryDTO queryByPublisherIds(List<String> publisherIds, String term, Integer page, Integer size) {
+    public ApiQueryDTO queryByPublisherIds(List<Integer> publisherIds, String term, Integer page, Integer size) {
         BoolQueryBuilder builder = boolQuery();
+        BoolQueryBuilder filter =  boolQuery();
+        builder.filter(filter);
+        
+        if (CollectionUtils.isEmpty(publisherIds)) {
+            return ApiQueryDTO.none();
+        } else {
+            publisherIds.forEach(i -> filter.should(matchQuery("publisherId", i)));
+            filter.should(nestedQuery("publisher", matchQuery("publisher.businessType", BusinessType.PUBLIC.name()), ScoreMode.Avg));
+        }
         if (StringUtils.isNotBlank(term)) {
             builder.must(multiMatchQuery(term, "name", "description", "doc"));
         }
-        BoolQueryBuilder filter =  boolQuery();
-        builder.filter(filter);
-        filter.should(nestedQuery("publisher", matchQuery("publisher.businessType", BusinessType.PUBLIC.name()), ScoreMode.Avg));
-        if (!CollectionUtils.isEmpty(publisherIds)) {
-            publisherIds.forEach(i -> filter.should(matchQuery("publisherId", i)));
-        }
+
         Query query = new NativeSearchQueryBuilder()
                 .withQuery(builder)
                 .withPageable(PageRequest.of(page, size))

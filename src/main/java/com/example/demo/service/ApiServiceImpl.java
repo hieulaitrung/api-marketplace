@@ -4,52 +4,61 @@ import com.example.demo.dao.ApiDao;
 import com.example.demo.dto.ApiQueryDTO;
 import com.example.demo.dto.ApiRequestDTO;
 import com.example.demo.entity.Api;
-import org.apache.commons.lang3.StringUtils;
+import com.example.demo.entity.Publisher;
+import com.example.demo.exception.ForbiddenException;
+import com.example.demo.security.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
+@Transactional
 public class ApiServiceImpl implements ApiService {
     @Autowired
     private PublisherService publisherService;
 
     @Autowired
+    private AuthService authService;
+
+    @Autowired
     private ApiDao apiDao;
 
     @Override
-    public ApiQueryDTO queryDTO(String id, String term, Integer page, Integer size) {
-        List<String> ids = new ArrayList<>();
-        if (StringUtils.isNotBlank(id)) {
-            ids = Arrays.asList(id.split(","));
+    public ApiQueryDTO queryDTO(String term, Integer publisherId, Integer page, Integer size) {
+        List<Integer> queryPublisherIds = User.getCurrent().getPublisherIds();
+        if (publisherId != null) {
+            queryPublisherIds = queryPublisherIds.contains(publisherId) ? Collections.singletonList(publisherId) : null;
         }
-        return apiDao.queryByPublisherIds(ids, term, page, size);
+        return apiDao.queryByPublisherIds(queryPublisherIds, term, page, size);
     }
 
     @Override
-    public Api get(Integer id) {
-        return apiDao.getById(id);
+    public Api get(Integer id) throws ForbiddenException {
+        Api api = apiDao.getById(id);
+        authService.validateAccess(User.getCurrent(), api.getPublisher());
+        return api;
     }
 
     @Override
-    public Api create(ApiRequestDTO dto) {
+    public Api create(ApiRequestDTO dto) throws ForbiddenException {
+        Publisher publisher = publisherService.getById(dto.getPublisherId());
+        authService.validateAccess(User.getCurrent(), publisher);
+
         Api api = new Api();
         api.setName(dto.getName());
         api.setDescription(dto.getDescription());
         api.setDoc(dto.getDoc());
         api.setCreatedOn(new Date());
         api.setUpdatedOn(new Date());
-        api.setPublisher(publisherService.getById(dto.getPublisherId()));
+        api.setPublisher(publisher);
 
         return apiDao.upsert(api);
     }
 
     @Override
-    public Api update(Integer id, ApiRequestDTO dto) {
+    public Api update(Integer id, ApiRequestDTO dto) throws ForbiddenException {
         Api api = get(id);
         api.setName(dto.getName());
         api.setDescription(dto.getDescription());
@@ -61,7 +70,8 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    public void delete(Integer id) {
+    public void delete(Integer id) throws ForbiddenException {
+        get(id);
         apiDao.delete(id);
     }
 }

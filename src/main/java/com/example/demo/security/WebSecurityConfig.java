@@ -1,25 +1,17 @@
 package com.example.demo.security;
 
-import com.example.demo.controller.model.ApiError;
-import com.example.demo.controller.model.ErrorInfo;
+import com.example.demo.constant.ErrorCode;
+import com.example.demo.dto.ErrorDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -40,8 +32,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/webjars/**",
                 "/csrf",
                 "/",
-                // TODO: remove
-                "/apis/**"
+                "/health"
         );
     }
 
@@ -54,11 +45,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .accessDeniedHandler((request, response, authException) -> {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.setHeader("Content-Type", "application/json");
-                    response.getWriter().print(mapper.writeValueAsString(ApiError.valueOf(ErrorInfo.TOKEN_UNAUTHORIZED)));
+                    response.getWriter().print(mapper.writeValueAsString(ErrorDTO.builder().errorCode(ErrorCode.TOKEN_UNAUTHORIZED.toString()).message("Token is unauthorized to perform action")));
                 }).authenticationEntryPoint((request, response, authException) -> {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.setHeader("Content-Type", "application/json");
-                    response.getWriter().print(mapper.writeValueAsString(ApiError.valueOf(ErrorInfo.PROTOCOL_UNAUTHORIZED)));
+                    response.getWriter().print(mapper.writeValueAsString(ErrorDTO.builder().errorCode(ErrorCode.TOKEN_INVALID.toString()).message("Token is missing or invalid")));
         });
     }
 }

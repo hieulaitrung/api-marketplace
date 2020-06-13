@@ -14,7 +14,6 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Table(name = "publisher")
-@ToString
 @RedisHash("publisher")
 public class Publisher extends BaseEntity implements Serializable {
 

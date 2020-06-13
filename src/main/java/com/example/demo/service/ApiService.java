@@ -3,19 +3,19 @@ package com.example.demo.service;
 import com.example.demo.dto.ApiQueryDTO;
 import com.example.demo.dto.ApiRequestDTO;
 import com.example.demo.entity.Api;
-
+import com.example.demo.exception.ForbiddenException;
 
 
 public interface ApiService {
 
-    ApiQueryDTO queryDTO(String id, String term, Integer page, Integer size);
+    ApiQueryDTO queryDTO(String term, Integer publisherId, Integer page, Integer size);
 
-    Api get(Integer id);
+    Api get(Integer id) throws ForbiddenException;
 
-    Api create(ApiRequestDTO dto);
+    Api create(ApiRequestDTO dto) throws ForbiddenException;
 
-    Api update(Integer id, ApiRequestDTO dto);
+    Api update(Integer id, ApiRequestDTO dto) throws ForbiddenException;
 
-    void delete(Integer id);
+    void delete(Integer id) throws ForbiddenException;
     
 }

@@ -1,11 +1,10 @@
 package com.example.demo.security;
 
-import com.example.demo.controller.model.ApiError;
-import com.example.demo.controller.model.ErrorInfo;
+import com.example.demo.dto.ErrorDTO;
+import com.example.demo.exception.BaseException;
+import com.example.demo.service.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,7 +18,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -30,14 +28,12 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
     private static String PREFIX = "Bearer ";
 
-    private static String SEPARATOR = " ";
-
     private static String AUTHORIZATION = "Authorization";
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    @Value("${jwt.publicKey}")
-    private String jwtPublicKey;
+    @Autowired
+    private AuthService authService;
 
     @Override
     public void doFilterInternal(HttpServletRequest servletRequest, HttpServletResponse servletResponse, FilterChain filterChain)
@@ -46,35 +42,26 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             Authentication authentication = getAuthentication(servletRequest);
             SecurityContextHolder.getContext().setAuthentication(authentication);
             filterChain.doFilter(servletRequest, servletResponse);
-        } catch (ExpiredJwtException eje) {
-            servletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        } catch (BaseException e) {
+            servletResponse.setStatus(e.getHttpCode());
             servletResponse.setHeader("Content-Type", "application/json");
-            servletResponse.getWriter().print(mapper.writeValueAsString(ApiError.valueOf(ErrorInfo.TOKEN_EXPIRED)));
-        } catch (Exception eje) {
-            servletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            servletResponse.getWriter().print(mapper.writeValueAsString(ErrorDTO.valueOf(e)));
+        } catch (Exception e) {
+            servletResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             servletResponse.setHeader("Content-Type", "application/json");
-            servletResponse.getWriter().print(mapper.writeValueAsString(ApiError.valueOf(ErrorInfo.PROTOCOL_UNAUTHORIZED)));
+            servletResponse.getWriter().print(mapper.writeValueAsString(ErrorDTO.from(e)));
         }
 }
 
-    public Authentication getAuthentication(HttpServletRequest request) {
+    private Authentication getAuthentication(HttpServletRequest request) throws BaseException {
         String token = request.getHeader(AUTHORIZATION);
         Authentication authentication = null;
         if (token != null) {
             // parse the token.
-            AccessTokenParser accessTokenParser = new AccessTokenParser(jwtPublicKey);
-            Claims claims = accessTokenParser.getClaims(token.replace(PREFIX, ""));
-
-            User user = new User();
-            user.setUserId(claims.getSubject());
-            String publisherIds = claims.get("publishers", String.class);
-            Optional.ofNullable(publisherIds).ifPresent(p -> user.setPublisherIds(Arrays.asList(p.split(" "))));
-            String scope = claims.get("scope", String.class);
+            User user = authService.validateToken(token.replace(PREFIX, ""));
             Set<GrantedAuthority> authorities = new HashSet<>();
-            Optional.ofNullable(scope)
-                    .map(s -> Arrays.asList(s.split(" ")))
-                    .map(l -> authorities.addAll(l.stream().map(s -> "SCOPE_" + s).map(SimpleGrantedAuthority::new).collect(Collectors.toList())));
-
+            Optional.ofNullable(user.getAuthorities())
+                    .map(a -> authorities.addAll(a.stream().map(s -> "SCOPE_" + s).map(SimpleGrantedAuthority::new).collect(Collectors.toList())));
             authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
