@@ -5,6 +5,7 @@ import com.example.demo.dto.ApiQueryDTO;
 import com.example.demo.dto.ApiRequestDTO;
 import com.example.demo.entity.Api;
 import com.example.demo.entity.Publisher;
+import com.example.demo.exception.BaseException;
 import com.example.demo.exception.ForbiddenException;
 import com.example.demo.security.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,14 +36,14 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    public Api get(Integer id) throws ForbiddenException {
+    public Api get(Integer id) throws BaseException {
         Api api = apiDao.getById(id);
         authService.validateAccess(User.getCurrent(), api.getPublisher());
         return api;
     }
 
     @Override
-    public Api create(ApiRequestDTO dto) throws ForbiddenException {
+    public Api create(ApiRequestDTO dto) throws BaseException {
         Publisher publisher = publisherService.getById(dto.getPublisherId());
         authService.validateAccess(User.getCurrent(), publisher);
 
@@ -58,7 +59,7 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    public Api update(Integer id, ApiRequestDTO dto) throws ForbiddenException {
+    public Api update(Integer id, ApiRequestDTO dto) throws BaseException {
         Api api = get(id);
         api.setName(dto.getName());
         api.setDescription(dto.getDescription());
@@ -70,7 +71,7 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    public void delete(Integer id) throws ForbiddenException {
+    public void delete(Integer id) throws BaseException {
         get(id);
         apiDao.delete(id);
     }

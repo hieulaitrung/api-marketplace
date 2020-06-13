@@ -4,6 +4,7 @@ import com.example.demo.dto.ApiDTO;
 import com.example.demo.dto.ApiQueryDTO;
 import com.example.demo.dto.ApiRequestDTO;
 import com.example.demo.entity.Api;
+import com.example.demo.exception.BaseException;
 import com.example.demo.exception.ForbiddenException;
 import com.example.demo.mapper.ApiMapper;
 import com.example.demo.service.ApiService;
@@ -46,7 +47,7 @@ public class ApiController {
     @PreAuthorize("hasAnyAuthority('SCOPE_api,SCOPE_api:read')")
     @ApiOperation("Return Api information by id")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Get Api successfully", response = ApiDTO.class)})
-    public ResponseEntity<ApiDTO> getApi(@PathVariable(value = "id") Integer id) throws ForbiddenException {
+    public ResponseEntity<ApiDTO> getApi(@PathVariable(value = "id") Integer id) throws BaseException {
         Api api = service.get(id);
         ApiDTO dto = mapper.mapToDto(api);
         return new ResponseEntity<>(dto, new HttpHeaders(), HttpStatus.OK);
@@ -56,7 +57,7 @@ public class ApiController {
     @PreAuthorize("hasAnyAuthority('SCOPE_api')")
     @ApiOperation("Create new Api")
     @ApiResponses(value = {@ApiResponse(code = 201, message = "Create Api successfully", response = ApiDTO.class)})
-    public ResponseEntity<ApiDTO> createApi(@RequestBody ApiRequestDTO dto) throws ForbiddenException {
+    public ResponseEntity<ApiDTO> createApi(@RequestBody ApiRequestDTO dto) throws BaseException {
         Api api = service.create(dto);
         ApiDTO createdApi = mapper.mapToDto(api);
         return new ResponseEntity<>(createdApi, new HttpHeaders(), HttpStatus.CREATED);
@@ -66,7 +67,7 @@ public class ApiController {
     @PreAuthorize("hasAnyAuthority('SCOPE_api')")
     @ApiOperation("Update Api")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Update Api successfully", response = ApiDTO.class)})
-    public ResponseEntity<ApiDTO> updateApi(@PathVariable(value = "id") Integer id, @RequestBody ApiRequestDTO dto) throws ForbiddenException {
+    public ResponseEntity<ApiDTO> updateApi(@PathVariable(value = "id") Integer id, @RequestBody ApiRequestDTO dto) throws BaseException {
         Api api = service.update(id, dto);
         ApiDTO updatedApi = mapper.mapToDto(api);
         return new ResponseEntity<>(updatedApi, new HttpHeaders(), HttpStatus.OK);
@@ -76,7 +77,7 @@ public class ApiController {
     @PreAuthorize("hasAnyAuthority('SCOPE_api')")
     @ApiOperation("Delete Api")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Delete Api successfully")})
-    public ResponseEntity<Void> deleteApi(@PathVariable(value = "id") Integer id) throws ForbiddenException {
+    public ResponseEntity<Void> deleteApi(@PathVariable(value = "id") Integer id) throws BaseException {
         service.delete(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }

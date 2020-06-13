@@ -1,15 +1,19 @@
 package com.example.demo.dao;
 
 import com.example.demo.constant.BusinessType;
+import com.example.demo.constant.ErrorCode;
 import com.example.demo.dto.ApiQueryDTO;
 import com.example.demo.elasticsearch.ApiDocument;
 import com.example.demo.elasticsearch.ApiPublisher;
 import com.example.demo.entity.Api;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.mapper.ApiMapper;
 import com.example.demo.repository.ApiRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -30,6 +34,8 @@ import static org.elasticsearch.index.query.QueryBuilders.*;
 @Repository
 public class ApiDao implements GenericDao<Api, Integer> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApiDao.class);
+
     @Autowired
     private ApiRepository apiRepository;
 
@@ -41,8 +47,8 @@ public class ApiDao implements GenericDao<Api, Integer> {
 
     @Override
     @Cacheable(value = API, key = "#id", unless = "#result == null")
-    public Api getById(Integer id) {
-        return apiRepository.getOne(id);
+    public Api getById(Integer id) throws ResourceNotFoundException {
+        return apiRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(ErrorCode.API_NOT_FOUND.toString(), "API not found " + id));
     }
 
     @Override
@@ -61,6 +67,7 @@ public class ApiDao implements GenericDao<Api, Integer> {
                 .build());
         operations.save(apiDocument);
         return api;
+
     }
 
     @Override

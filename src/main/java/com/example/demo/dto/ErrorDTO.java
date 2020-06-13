@@ -6,7 +6,6 @@ import lombok.*;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ErrorDTO {
@@ -23,10 +22,31 @@ public class ErrorDTO {
         return r;
     }
 
-    public static ErrorDTO from(Exception error)  {
+    public static ErrorDTO serverError() {
         ErrorDTO r = new ErrorDTO();
         r.errorCode = ErrorCode.SERVER_ERROR.toString();
         r.message = "Something went wrong";
+        return r;
+    }
+
+    public static ErrorDTO badRequest() {
+        ErrorDTO r = new ErrorDTO();
+        r.errorCode = ErrorCode.BAD_REQUEST.toString();
+        r.message = "Invalid request";
+        return r;
+    }
+
+    public static ErrorDTO methodNotAllowed() {
+        ErrorDTO r = new ErrorDTO();
+        r.errorCode = ErrorCode.METHOD_NOT_ALLOWED.toString();
+        r.message = "Method is not allowed";
+        return r;
+    }
+
+    public static ErrorDTO mediaTypeNotSupported() {
+        ErrorDTO r = new ErrorDTO();
+        r.errorCode = ErrorCode.UNSUPPORTED_MEDIA_TYPE.toString();
+        r.message = "Media type is not supported";
         return r;
     }
 }

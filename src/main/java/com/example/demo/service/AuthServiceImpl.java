@@ -11,6 +11,8 @@ import com.example.demo.security.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -27,13 +29,15 @@ import java.util.stream.Collectors;
 @Service
 public class AuthServiceImpl implements  AuthService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthService.class);
+
     @Value("${jwt.publicKey}")
     private String jwtPublicKey;
 
     @Override
     public void validateAccess(User user, Publisher publisher) throws ForbiddenException {
         if (BusinessType.PRIVATE.equals(publisher.getBusinessType()) && !user.getPublisherIds().contains(publisher.getId())) {
-            System.out.println("UnauthorizedException");
+            LOGGER.warn("User {} doesn’t belong to given publisher {}", user.getUserId(), publisher.getId());
             throw new ForbiddenException(ErrorCode.PUBLISHER_UNAUTHORIZED.toString(), "User doesn’t belong to given publisher");
         }
     }
@@ -58,9 +62,11 @@ public class AuthServiceImpl implements  AuthService {
             PublicKey key = decodePublicKey(pemToDer(jwtPublicKey));
             return Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody();
         } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+            LOGGER.error("Error to getClaims from token {}", token);
             throw new SystemErrorException("Error to getClaims from token " + token, e);
-        } catch (ExpiredJwtException e ) {
-           throw new TokenExpiredException("Token is expired", e);
+        } catch (ExpiredJwtException e) {
+            LOGGER.warn("Token is expired {}", token);
+            throw new TokenExpiredException("Token is expired", e);
         }
     }
 

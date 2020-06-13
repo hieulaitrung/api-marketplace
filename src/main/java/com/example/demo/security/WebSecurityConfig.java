@@ -45,11 +45,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .accessDeniedHandler((request, response, authException) -> {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.setHeader("Content-Type", "application/json");
-                    response.getWriter().print(mapper.writeValueAsString(ErrorDTO.builder().errorCode(ErrorCode.TOKEN_UNAUTHORIZED.toString()).message("Token is unauthorized to perform action")));
-                }).authenticationEntryPoint((request, response, authException) -> {
+                    response.getWriter().print(mapper.writeValueAsString(new ErrorDTO(ErrorCode.TOKEN_UNAUTHORIZED.toString(), "Token is unauthorized to perform action")));
+                })
+                .authenticationEntryPoint((request, response, authException) -> {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.setHeader("Content-Type", "application/json");
-                    response.getWriter().print(mapper.writeValueAsString(ErrorDTO.builder().errorCode(ErrorCode.TOKEN_INVALID.toString()).message("Token is missing or invalid")));
-        });
+                    response.getWriter().print(mapper.writeValueAsString(new ErrorDTO(ErrorCode.TOKEN_INVALID.toString(), "Token is missing or invalid")));
+                });
     }
 }

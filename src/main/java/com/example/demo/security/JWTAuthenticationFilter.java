@@ -46,11 +46,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             servletResponse.setStatus(e.getHttpCode());
             servletResponse.setHeader("Content-Type", "application/json");
             servletResponse.getWriter().print(mapper.writeValueAsString(ErrorDTO.valueOf(e)));
-        } catch (Exception e) {
-            servletResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            servletResponse.setHeader("Content-Type", "application/json");
-            servletResponse.getWriter().print(mapper.writeValueAsString(ErrorDTO.from(e)));
-        }
+        } 
 }
 
     private Authentication getAuthentication(HttpServletRequest request) throws BaseException {
