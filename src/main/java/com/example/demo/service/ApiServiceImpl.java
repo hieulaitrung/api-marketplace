@@ -58,10 +58,11 @@ public class ApiServiceImpl implements ApiService {
         authService.validateAccess(User.getCurrent(), publisher);
 
         Api api = (id == null) ? new Api() : get(id);
+        api.setCreatedOn((id == null) ? new Date() : api.getCreatedOn());
+        api.setUpdatedOn(new Date());
         api.setName(dto.getName());
         api.setDescription(dto.getDescription());
         api.setDoc(dto.getDoc());
-        api.setUpdatedOn(new Date());
         api.setPublisher(publisher);
 
         return apiDao.upsert(api);

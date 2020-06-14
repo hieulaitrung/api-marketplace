@@ -8,6 +8,7 @@ import com.example.demo.entity.Api;
 import com.example.demo.entity.Publisher;
 import com.example.demo.repository.ApiRepository;
 import com.example.demo.repository.PublisherRepository;
+import com.example.demo.security.JWTAuthenticationFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.After;
 import org.junit.Before;
@@ -31,7 +32,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc
 public class ApiIntegrationTest extends  BaseIntegrationTest {
     @Autowired
     private MockMvc mvc;
@@ -48,6 +48,9 @@ public class ApiIntegrationTest extends  BaseIntegrationTest {
     private Publisher publisher;
 
     private Api api;
+
+    //TODO: generate it
+    private String token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhpZXVsYWl0cnVuZ0BnbWFpbC5jb20iLCJzY29wZSI6ImFwaSIsInB1Ymxpc2hlcnMiOiIxIDUiLCJpYXQiOjE1OTIxMTcxMTQsImV4cCI6MTU5MjE2MDMxNCwiYXVkIjoiQXBwIiwiaXNzIjoiRGVtbyBjb3JwIiwic3ViIjoiMSJ9.Uoh50w09JjMaByk2IOS5dDhv7gomgy6Gkp5t51KFTd5DcJWrVsdcq6J9XyA8Zmz93nbAeQOKC90EcL_2VwABSvDbhTJhd7MDpVoHL94cnhfJvQbyHkbDj76dK4USRbn38GZWGVW41kIDq_lvwE9AJtzsWAKq9t6XbCk3xDwLG5cWEFRdv8IlNWfgFxvsvfsPyqefrSGlbIC6uCHtbHSRsVrwFnDTHZ-Mde-2WFjz0Y4hbbgyqrPvZhr6M9LRo18K9sbPZ5YoaMtyWw62Iye2ZerkLdvw_kIUXiiP5u_TnTO5LA-wWlFpnv3eOf5xXtNAcwAiBpSqEje_I31za9SkZdHmdm92SggOn60LTJ3X5KutARIhipf7PUvfQ5Ts_86mg8wyVMbxAT5B0l7wLf5c-TUpUHHpIrBgCpatcpzEu61YvXUEj_g0pQdGYkVl6RPSXqX1bp75coF7-7eMeWOAIUyxSQRf4u7ofqobXJIZCfZXZ9NXbatLoNgitlWGDPFrSYcHFMXeJIq5WEFZRJYER16rcRmGS9H63TOX2MNwahCQ1nHRoH7PEf7S72zMQo23Np7cdfhpi5jA2g-MNRF9EFgp4b11foanEMYvIHJEp_tY8zbiYqx-hbD4u5F0TYEjPjWuqb2yNf1ei-rzdHZund00ahL33YhNp7oaU9ihObw";
 
     final static ObjectMapper MAPPER = new ObjectMapper();
 
@@ -113,6 +116,7 @@ public class ApiIntegrationTest extends  BaseIntegrationTest {
 
         mvc.perform(post("/apis")
                 .accept(MediaType.APPLICATION_JSON)
+                .header(JWTAuthenticationFilter.AUTHORIZATION, JWTAuthenticationFilter.PREFIX + token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(apiCreateDTO)))
                 .andExpect(status().isCreated())
@@ -125,6 +129,7 @@ public class ApiIntegrationTest extends  BaseIntegrationTest {
     public void givenNothing_whenGetAPI_thenStatus200() throws Exception {
         mvc.perform(get("/apis/{id}", api.getId())
                 .accept(MediaType.APPLICATION_JSON)
+                .header(JWTAuthenticationFilter.AUTHORIZATION, JWTAuthenticationFilter.PREFIX + token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(api.getId())))
@@ -136,6 +141,7 @@ public class ApiIntegrationTest extends  BaseIntegrationTest {
     public void givenNothing_whenGetAPIs_thenStatus200() throws Exception {
         mvc.perform(get("/apis", api.getId())
                 .accept(MediaType.APPLICATION_JSON)
+                .header(JWTAuthenticationFilter.AUTHORIZATION, JWTAuthenticationFilter.PREFIX + token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total", is(1)))
@@ -154,6 +160,7 @@ public class ApiIntegrationTest extends  BaseIntegrationTest {
 
         mvc.perform(put("/apis/{id}", api.getId())
                 .accept(MediaType.APPLICATION_JSON)
+                .header(JWTAuthenticationFilter.AUTHORIZATION, JWTAuthenticationFilter.PREFIX + token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(apiRequestDTO)))
                 .andExpect(status().isOk())
@@ -166,6 +173,7 @@ public class ApiIntegrationTest extends  BaseIntegrationTest {
     public void givenNothing_whenDeleteAPI_thenStatus201() throws Exception {
         mvc.perform(delete("/apis/{id}", api.getId())
                 .accept(MediaType.APPLICATION_JSON)
+                .header(JWTAuthenticationFilter.AUTHORIZATION, JWTAuthenticationFilter.PREFIX + token)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
