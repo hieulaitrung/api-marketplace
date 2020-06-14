@@ -1,7 +1,7 @@
 package com.example.demo.dto;
 
 import com.example.demo.constant.ErrorCode;
-import com.example.demo.exception.BaseException;
+import com.example.demo.exception.DemoException;
 import lombok.*;
 
 @Getter
@@ -15,7 +15,7 @@ public class ErrorDTO {
     private String message;
 
 
-    public static ErrorDTO valueOf(BaseException error)  {
+    public static ErrorDTO valueOf(DemoException error)  {
         ErrorDTO r = new ErrorDTO();
         r.errorCode = error.getErrorCode();
         r.message = error.getMessage();

@@ -1,7 +1,7 @@
 package com.example.demo.security;
 
 import com.example.demo.dto.ErrorDTO;
-import com.example.demo.exception.BaseException;
+import com.example.demo.exception.DemoException;
 import com.example.demo.service.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,14 +46,14 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             Authentication authentication = getAuthentication(servletRequest);
             SecurityContextHolder.getContext().setAuthentication(authentication);
             filterChain.doFilter(servletRequest, servletResponse);
-        } catch (BaseException e) {
+        } catch (DemoException e) {
             servletResponse.setStatus(e.getHttpCode());
             servletResponse.setHeader("Content-Type", "application/json");
             servletResponse.getWriter().print(mapper.writeValueAsString(ErrorDTO.valueOf(e)));
         }
 }
 
-    private Authentication getAuthentication(HttpServletRequest request) throws BaseException {
+    private Authentication getAuthentication(HttpServletRequest request) throws DemoException {
         String token = request.getHeader(AUTHORIZATION);
         Authentication authentication = null;
         if (token != null) {

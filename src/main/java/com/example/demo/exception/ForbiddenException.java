@@ -2,7 +2,7 @@ package com.example.demo.exception;
 
 import org.springframework.http.HttpStatus;
 
-public class ForbiddenException extends BaseException {
+public class ForbiddenException extends DemoException {
 
     public ForbiddenException(String errorCode, String message) {
         super(HttpStatus.FORBIDDEN.value(), errorCode, message);

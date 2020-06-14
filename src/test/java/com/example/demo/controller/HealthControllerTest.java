@@ -1,5 +1,6 @@
-package com.example.demo;
+package com.example.demo.controller;
 
+import com.example.demo.TestingWebApplication;
 import com.example.demo.controller.HealthController;
 import com.example.demo.service.AuthService;
 import org.junit.Test;

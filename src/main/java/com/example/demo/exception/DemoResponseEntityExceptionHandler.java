@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -26,8 +25,8 @@ public class DemoResponseEntityExceptionHandler extends ResponseEntityExceptionH
         return new ResponseEntity(ErrorDTO.forbidden(), HttpStatus.FORBIDDEN);
     }
 
-    @ExceptionHandler(BaseException.class)
-    public ResponseEntity<ErrorDTO> notFoundExceptionHandler(BaseException e) {
+    @ExceptionHandler(DemoException.class)
+    public ResponseEntity<ErrorDTO> notFoundExceptionHandler(DemoException e) {
         return new ResponseEntity(ErrorDTO.valueOf(e), HttpStatus.valueOf(e.getHttpCode()));
     }
 

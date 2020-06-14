@@ -1,5 +1,6 @@
-package com.example.demo;
+package com.example.demo.controller;
 
+import com.example.demo.TestingWebApplication;
 import com.example.demo.constant.ErrorCode;
 import com.example.demo.controller.ApiController;
 import com.example.demo.dto.ApiQueryDTO;
@@ -29,8 +30,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.Collections;
 
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -132,7 +132,7 @@ public class ApiControllerTest {
         String token = "fake";
         mockAuth(token);
         int id = 1;
-        when(apiService.get(id)).thenThrow(new ResourceNotFoundException(ErrorCode.API_NOT_FOUND.toString(), "Api not found " + id));
+        when(apiService.get(anyInt(), any(User.class))).thenThrow(new ResourceNotFoundException(ErrorCode.API_NOT_FOUND.toString(), "Api not found " + id));
 
         mvc.perform(get("/apis/{id}", id)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -146,7 +146,7 @@ public class ApiControllerTest {
         String token = "fake";
         mockAuth(token);
         int id = 1;
-        when(apiService.get(id)).thenThrow(new ForbiddenException(ErrorCode.PUBLISHER_UNAUTHORIZED.toString(), "User doesn’t belong to given publisher"));
+        when(apiService.get(anyInt(), any(User.class))).thenThrow(new ForbiddenException(ErrorCode.PUBLISHER_UNAUTHORIZED.toString(), "User doesn’t belong to given publisher"));
 
         mvc.perform(get("/apis/{id}", id)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -160,7 +160,7 @@ public class ApiControllerTest {
         String token = "fake";
         mockAuth(token);
         int id = 1;
-        when(apiService.queryDTO(null, null, 0, 10)).thenReturn(ApiQueryDTO.none());
+        when(apiService.queryDTO(eq(null), eq(null), anyInt(), anyInt(), any(User.class))).thenReturn(ApiQueryDTO.none());
         mvc.perform(get("/apis")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(JWTAuthenticationFilter.AUTHORIZATION, JWTAuthenticationFilter.PREFIX + token))
@@ -173,7 +173,7 @@ public class ApiControllerTest {
         String token = "fake";
         mockAuth(token);
         int id = 1;
-        when(apiService.update(anyInt(), any(ApiRequestDTO.class))).thenThrow(new ResourceNotFoundException(ErrorCode.API_NOT_FOUND.toString(), "Api not found " + id));
+        when(apiService.update(anyInt(), any(ApiRequestDTO.class), any(User.class))).thenThrow(new ResourceNotFoundException(ErrorCode.API_NOT_FOUND.toString(), "Api not found " + id));
 
         ObjectMapper mapper = new ObjectMapper();
         String req = mapper.writeValueAsString(mockApiRequest());
@@ -191,7 +191,7 @@ public class ApiControllerTest {
         String token = "fake";
         mockAuth(token);
         int id = 1;
-        when(apiService.update(anyInt(), any(ApiRequestDTO.class))).thenThrow(new ForbiddenException(ErrorCode.PUBLISHER_UNAUTHORIZED.toString(), "User doesn’t belong to given publisher"));
+        when(apiService.update(anyInt(), any(ApiRequestDTO.class), any(User.class))).thenThrow(new ForbiddenException(ErrorCode.PUBLISHER_UNAUTHORIZED.toString(), "User doesn’t belong to given publisher"));
 
         ObjectMapper mapper = new ObjectMapper();
         String req = mapper.writeValueAsString(mockApiRequest());
@@ -209,7 +209,7 @@ public class ApiControllerTest {
         String token = "fake";
         mockAuth(token);
         int id = 1;
-        when(apiService.update(anyInt(), any(ApiRequestDTO.class))).thenThrow(new ResourceNotFoundException(ErrorCode.PUBLISHER_NOT_FOUND.toString(), "Publisher not found " + id));
+        when(apiService.update(anyInt(), any(ApiRequestDTO.class), any(User.class))).thenThrow(new ResourceNotFoundException(ErrorCode.PUBLISHER_NOT_FOUND.toString(), "Publisher not found " + id));
 
         ObjectMapper mapper = new ObjectMapper();
         String req = mapper.writeValueAsString(mockApiRequest());
@@ -227,7 +227,7 @@ public class ApiControllerTest {
         String token = "fake";
         mockAuth(token);
         int id = 1;
-        when(apiService.create(any(ApiRequestDTO.class))).thenThrow(new ResourceNotFoundException(ErrorCode.PUBLISHER_NOT_FOUND.toString(), "Publisher not found " + id));
+        when(apiService.create(any(ApiRequestDTO.class), any(User.class))).thenThrow(new ResourceNotFoundException(ErrorCode.PUBLISHER_NOT_FOUND.toString(), "Publisher not found " + id));
 
         ObjectMapper mapper = new ObjectMapper();
         String req = mapper.writeValueAsString(mockApiRequest());
@@ -245,7 +245,7 @@ public class ApiControllerTest {
         String token = "fake";
         mockAuth(token);
         int id = 1;
-        when(apiService.create(any(ApiRequestDTO.class))).thenThrow(new ForbiddenException(ErrorCode.PUBLISHER_UNAUTHORIZED.toString(), "User doesn’t belong to given publisher"));
+        when(apiService.create(any(ApiRequestDTO.class), any(User.class))).thenThrow(new ForbiddenException(ErrorCode.PUBLISHER_UNAUTHORIZED.toString(), "User doesn’t belong to given publisher"));
 
         ObjectMapper mapper = new ObjectMapper();
         String req = mapper.writeValueAsString(mockApiRequest());

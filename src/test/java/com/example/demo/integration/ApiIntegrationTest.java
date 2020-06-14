@@ -1,5 +1,6 @@
 package com.example.demo.integration;
 
+import com.example.demo.JwtUtil;
 import com.example.demo.constant.BusinessType;
 import com.example.demo.elasticsearch.ApiDocument;
 import com.example.demo.elasticsearch.ApiPublisher;
@@ -9,6 +10,8 @@ import com.example.demo.entity.Publisher;
 import com.example.demo.repository.ApiRepository;
 import com.example.demo.repository.PublisherRepository;
 import com.example.demo.security.JWTAuthenticationFilter;
+import com.example.demo.security.User;
+import com.example.demo.service.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.After;
 import org.junit.Before;
@@ -18,6 +21,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.document.Document;
 import org.springframework.http.MediaType;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.ResourceUtils;
 import org.testcontainers.shaded.org.apache.commons.io.FileUtils;
@@ -25,6 +29,13 @@ import org.testcontainers.shaded.org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyPair;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.Date;
 
 import static org.hamcrest.Matchers.*;
@@ -43,14 +54,18 @@ public class ApiIntegrationTest extends  BaseIntegrationTest {
     private ApiRepository apiRepository;
 
     @Autowired
+    private AuthService authService;
+
+    @Autowired
     private ElasticsearchOperations operations;
 
     private Publisher publisher;
 
     private Api api;
 
-    //TODO: generate it
-    private String token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhpZXVsYWl0cnVuZ0BnbWFpbC5jb20iLCJzY29wZSI6ImFwaSIsInB1Ymxpc2hlcnMiOiIxIDUiLCJpYXQiOjE1OTIxMTcxMTQsImV4cCI6MTU5MjE2MDMxNCwiYXVkIjoiQXBwIiwiaXNzIjoiRGVtbyBjb3JwIiwic3ViIjoiMSJ9.Uoh50w09JjMaByk2IOS5dDhv7gomgy6Gkp5t51KFTd5DcJWrVsdcq6J9XyA8Zmz93nbAeQOKC90EcL_2VwABSvDbhTJhd7MDpVoHL94cnhfJvQbyHkbDj76dK4USRbn38GZWGVW41kIDq_lvwE9AJtzsWAKq9t6XbCk3xDwLG5cWEFRdv8IlNWfgFxvsvfsPyqefrSGlbIC6uCHtbHSRsVrwFnDTHZ-Mde-2WFjz0Y4hbbgyqrPvZhr6M9LRo18K9sbPZ5YoaMtyWw62Iye2ZerkLdvw_kIUXiiP5u_TnTO5LA-wWlFpnv3eOf5xXtNAcwAiBpSqEje_I31za9SkZdHmdm92SggOn60LTJ3X5KutARIhipf7PUvfQ5Ts_86mg8wyVMbxAT5B0l7wLf5c-TUpUHHpIrBgCpatcpzEu61YvXUEj_g0pQdGYkVl6RPSXqX1bp75coF7-7eMeWOAIUyxSQRf4u7ofqobXJIZCfZXZ9NXbatLoNgitlWGDPFrSYcHFMXeJIq5WEFZRJYER16rcRmGS9H63TOX2MNwahCQ1nHRoH7PEf7S72zMQo23Np7cdfhpi5jA2g-MNRF9EFgp4b11foanEMYvIHJEp_tY8zbiYqx-hbD4u5F0TYEjPjWuqb2yNf1ei-rzdHZund00ahL33YhNp7oaU9ihObw";
+    private KeyPair keyPair = JwtUtil.getKeyPair();
+
+    private String token;
 
     final static ObjectMapper MAPPER = new ObjectMapper();
 
@@ -61,6 +76,7 @@ public class ApiIntegrationTest extends  BaseIntegrationTest {
     @Before
     public void setUp() throws IOException, InterruptedException {
         prepareIndex();
+        prepareJwt();
 
         publisher = new Publisher();
         publisher.setName("Publisher");
@@ -88,6 +104,18 @@ public class ApiIntegrationTest extends  BaseIntegrationTest {
                 .build());
         operations.save(apiDocument);
         operations.indexOps(ApiDocument.class).refresh();
+
+        LocalDateTime dateTime = LocalDateTime.now().plus(Duration.of(10, ChronoUnit.MINUTES));
+        Date tmfn = Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant());
+        User user = new User();
+        user.setUserId(1);
+        user.setPublisherIds(Arrays.asList(publisher.getId()));
+        token = JwtUtil.sign(keyPair.getPrivate(), user, "api", tmfn);
+    }
+
+    private void prepareJwt(){
+        String publicKey = Base64.getEncoder().encodeToString(keyPair.getPublic().getEncoded());
+        ReflectionTestUtils.setField(authService, "jwtPublicKey", publicKey);
     }
 
     private void prepareIndex() throws IOException {
