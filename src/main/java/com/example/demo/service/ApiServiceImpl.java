@@ -6,13 +6,14 @@ import com.example.demo.dto.ApiRequestDTO;
 import com.example.demo.entity.Api;
 import com.example.demo.entity.Publisher;
 import com.example.demo.exception.BaseException;
-import com.example.demo.exception.ForbiddenException;
 import com.example.demo.security.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 @Service
 @Transactional
@@ -44,28 +45,24 @@ public class ApiServiceImpl implements ApiService {
 
     @Override
     public Api create(ApiRequestDTO dto) throws BaseException {
-        Publisher publisher = publisherService.getById(dto.getPublisherId());
-        authService.validateAccess(User.getCurrent(), publisher);
-
-        Api api = new Api();
-        api.setName(dto.getName());
-        api.setDescription(dto.getDescription());
-        api.setDoc(dto.getDoc());
-        api.setCreatedOn(new Date());
-        api.setUpdatedOn(new Date());
-        api.setPublisher(publisher);
-
-        return apiDao.upsert(api);
+        return doUpsert(null, dto);
     }
 
     @Override
     public Api update(Integer id, ApiRequestDTO dto) throws BaseException {
-        Api api = get(id);
+        return doUpsert(id, dto);
+    }
+
+    private Api doUpsert(Integer id, ApiRequestDTO dto) throws BaseException {
+        Publisher publisher = publisherService.getById(dto.getPublisherId());
+        authService.validateAccess(User.getCurrent(), publisher);
+
+        Api api = (id == null) ? new Api() : get(id);
         api.setName(dto.getName());
         api.setDescription(dto.getDescription());
         api.setDoc(dto.getDoc());
         api.setUpdatedOn(new Date());
-        api.setPublisher(publisherService.getById(dto.getPublisherId()));
+        api.setPublisher(publisher);
 
         return apiDao.upsert(api);
     }

@@ -42,9 +42,6 @@ public class ApiDao implements GenericDao<Api, Integer> {
     @Autowired
     private ElasticsearchOperations operations;
 
-    @Autowired
-    private ApiMapper mapper;
-
     @Override
     @Cacheable(value = API, key = "#id", unless = "#result == null")
     public Api getById(Integer id) throws ResourceNotFoundException {
@@ -97,6 +94,6 @@ public class ApiDao implements GenericDao<Api, Integer> {
                 .withPageable(PageRequest.of(page, size))
                 .build();
         SearchHits<ApiDocument> searchHits = operations.search(query, ApiDocument.class);
-        return mapper.mapToDto(searchHits);
+        return ApiMapper.mapToDto(searchHits);
     }
 }

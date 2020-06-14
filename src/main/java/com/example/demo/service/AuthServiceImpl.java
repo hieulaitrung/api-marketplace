@@ -3,14 +3,13 @@ package com.example.demo.service;
 import com.example.demo.constant.BusinessType;
 import com.example.demo.constant.ErrorCode;
 import com.example.demo.entity.Publisher;
-import com.example.demo.exception.BaseException;
-import com.example.demo.exception.ForbiddenException;
-import com.example.demo.exception.SystemErrorException;
-import com.example.demo.exception.TokenExpiredException;
+import com.example.demo.exception.*;
 import com.example.demo.security.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.io.DecodingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -61,12 +60,15 @@ public class AuthServiceImpl implements  AuthService {
         try {
             PublicKey key = decodePublicKey(pemToDer(jwtPublicKey));
             return Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody();
-        } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
-            LOGGER.error("Error to getClaims from token {}", token);
-            throw new SystemErrorException("Error to getClaims from token " + token, e);
+        } catch (DecodingException | MalformedJwtException e) {
+            LOGGER.warn("Token is invalid {}", token);
+            throw new TokenInvalidException("Invalid token", e);
         } catch (ExpiredJwtException e) {
             LOGGER.warn("Token is expired {}", token);
             throw new TokenExpiredException("Token is expired", e);
+        } catch (Exception e) {
+            LOGGER.error("Error to getClaims from token {}", token);
+            throw new SystemErrorException("Error to getClaims from token", e);
         }
     }
 

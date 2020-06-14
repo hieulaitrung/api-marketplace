@@ -42,11 +42,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         http.exceptionHandling()
-                .accessDeniedHandler((request, response, authException) -> {
-                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    response.setHeader("Content-Type", "application/json");
-                    response.getWriter().print(mapper.writeValueAsString(new ErrorDTO(ErrorCode.TOKEN_UNAUTHORIZED.toString(), "Token is unauthorized to perform action")));
-                })
                 .authenticationEntryPoint((request, response, authException) -> {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.setHeader("Content-Type", "application/json");

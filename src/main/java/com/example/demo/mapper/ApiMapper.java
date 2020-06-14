@@ -10,9 +10,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
 
-@Component("DtoApiMapper")
 public class ApiMapper {
-    public ApiDTO mapToDto(Api entity) {
+    public static ApiDTO mapToDto(Api entity) {
         ApiDTO dto = new ApiDTO();
         dto.setId(entity.getId());
         dto.setName(entity.getName());
@@ -22,17 +21,17 @@ public class ApiMapper {
         return dto;
     }
 
-    public ApiQueryDTO mapToDto(SearchHits<ApiDocument> searchHits) {
+    public static ApiQueryDTO mapToDto(SearchHits<ApiDocument> searchHits) {
         ApiQueryDTO dto = new ApiQueryDTO();
         dto.setTotal(searchHits.getTotalHits());
         dto.setApiDTOS(searchHits.get()
                 .map(SearchHit::getContent)
-                .map(this::mapToDto)
+                .map(ApiMapper::mapToDto)
                 .collect(Collectors.toList()));
         return dto;
     }
 
-    private ApiDTO mapToDto(ApiDocument apiDocument) {
+    private static ApiDTO mapToDto(ApiDocument apiDocument) {
         ApiDTO dto = new ApiDTO();
         dto.setId(apiDocument.getId());
         dto.setName(apiDocument.getName());

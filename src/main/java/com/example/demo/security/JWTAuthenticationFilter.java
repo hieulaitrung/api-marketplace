@@ -26,14 +26,18 @@ import java.util.stream.Collectors;
 @Component
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
-    private static String PREFIX = "Bearer ";
+    public static String PREFIX = "Bearer ";
 
-    private static String AUTHORIZATION = "Authorization";
+    public static String AUTHORIZATION = "Authorization";
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    @Autowired
     private AuthService authService;
+
+    @Autowired
+    public JWTAuthenticationFilter(AuthService authService) {
+        this.authService = authService;
+    }
 
     @Override
     public void doFilterInternal(HttpServletRequest servletRequest, HttpServletResponse servletResponse, FilterChain filterChain)
@@ -46,7 +50,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             servletResponse.setStatus(e.getHttpCode());
             servletResponse.setHeader("Content-Type", "application/json");
             servletResponse.getWriter().print(mapper.writeValueAsString(ErrorDTO.valueOf(e)));
-        } 
+        }
 }
 
     private Authentication getAuthentication(HttpServletRequest request) throws BaseException {

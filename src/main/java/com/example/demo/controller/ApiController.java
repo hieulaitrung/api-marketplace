@@ -5,7 +5,6 @@ import com.example.demo.dto.ApiQueryDTO;
 import com.example.demo.dto.ApiRequestDTO;
 import com.example.demo.entity.Api;
 import com.example.demo.exception.BaseException;
-import com.example.demo.exception.ForbiddenException;
 import com.example.demo.mapper.ApiMapper;
 import com.example.demo.service.ApiService;
 import io.swagger.annotations.ApiOperation;
@@ -24,11 +23,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/apis")
 public class ApiController {
 
-    @Autowired
-    private ApiMapper mapper;
+    private ApiService service;
 
     @Autowired
-    private ApiService service;
+    public ApiController(ApiService service) {
+        this.service = service;
+    }
 
     @RequestMapping(method = RequestMethod.GET, value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation("Return Api information")
@@ -49,7 +49,7 @@ public class ApiController {
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Get Api successfully", response = ApiDTO.class)})
     public ResponseEntity<ApiDTO> getApi(@PathVariable(value = "id") Integer id) throws BaseException {
         Api api = service.get(id);
-        ApiDTO dto = mapper.mapToDto(api);
+        ApiDTO dto = ApiMapper.mapToDto(api);
         return new ResponseEntity<>(dto, new HttpHeaders(), HttpStatus.OK);
     }
 
@@ -59,7 +59,7 @@ public class ApiController {
     @ApiResponses(value = {@ApiResponse(code = 201, message = "Create Api successfully", response = ApiDTO.class)})
     public ResponseEntity<ApiDTO> createApi(@RequestBody ApiRequestDTO dto) throws BaseException {
         Api api = service.create(dto);
-        ApiDTO createdApi = mapper.mapToDto(api);
+        ApiDTO createdApi = ApiMapper.mapToDto(api);
         return new ResponseEntity<>(createdApi, new HttpHeaders(), HttpStatus.CREATED);
     }
 
@@ -69,7 +69,7 @@ public class ApiController {
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Update Api successfully", response = ApiDTO.class)})
     public ResponseEntity<ApiDTO> updateApi(@PathVariable(value = "id") Integer id, @RequestBody ApiRequestDTO dto) throws BaseException {
         Api api = service.update(id, dto);
-        ApiDTO updatedApi = mapper.mapToDto(api);
+        ApiDTO updatedApi = ApiMapper.mapToDto(api);
         return new ResponseEntity<>(updatedApi, new HttpHeaders(), HttpStatus.OK);
     }
 
