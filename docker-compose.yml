@@ -13,6 +13,11 @@ services:
       JDBC_URL: jdbc:postgresql://db:5432/api_marketplace
       JDBC_USER: postgres
       JDBC_PASSWORD: example
+      ES_HOSTPORT: elasticsearch:9200
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ""
+
 
   db:
     build: docker/images/postgres

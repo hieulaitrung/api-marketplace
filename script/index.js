@@ -19,7 +19,7 @@ var signOptions = {
  issuer:  i,
  subject:  s,
  audience:  a,
- expiresIn:  "1s",
+ expiresIn:  "12h",
  algorithm:  "RS256"
 };
 
