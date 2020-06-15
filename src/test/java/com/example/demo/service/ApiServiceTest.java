@@ -50,6 +50,14 @@ public class ApiServiceTest {
         return publisher;
     }
 
+    private Publisher publicPublisher(){
+        Publisher publisher = new Publisher();
+        publisher.setId(2);
+        publisher.setName("Publisher");
+        publisher.setBusinessType(BusinessType.PUBLIC);
+        return publisher;
+    }
+
     private Api api(){
         Api api = new Api();
         api.setId(1);
@@ -57,6 +65,16 @@ public class ApiServiceTest {
         api.setDescription("description");
         api.setDoc("doc");
         api.setPublisher(publisher());
+        return api;
+    }
+
+    private Api publicApi(){
+        Api api = new Api();
+        api.setId(2);
+        api.setName("Api");
+        api.setDescription("description");
+        api.setDoc("doc");
+        api.setPublisher(publicPublisher());
         return api;
     }
 
@@ -85,25 +103,36 @@ public class ApiServiceTest {
 
     @Test
     public void givenAuthorizedUser_getById_shouldOK() throws DemoException {
-        Integer id = 1;
-        when(apiDao.getById(id)).thenReturn(api());
-        Api api = underTest.get(id, user());
+        Api api =  api();
+        Integer id = api.getId();
+        when(apiDao.getById(id)).thenReturn(api);
+        api = underTest.get(id, user());
+        assertThat(api, notNullValue());
+        assertThat(api.getId(), is(id));
+    }
+
+    @Test
+    public void givenAuthorizedUserAndPublicApi_getById_shouldOK() throws DemoException {
+        Api api =  publicApi();
+        Integer id = api.getId();
+        when(apiDao.getById(id)).thenReturn(api);
+        api = underTest.get(id, user());
         assertThat(api, notNullValue());
         assertThat(api.getId(), is(id));
     }
 
     @Test(expected = ResourceNotFoundException.class)
     public void givenAuthorizedUserNotFoundApi_getById_shouldThrowException() throws DemoException {
-        Integer id = 1;
-        when(apiDao.getById(id)).thenThrow(new ResourceNotFoundException(ErrorCode.API_NOT_FOUND.toString(), "none"));
-        underTest.get(id, user());
+        Api api = api();
+        when(apiDao.getById(api.getId())).thenThrow(new ResourceNotFoundException(ErrorCode.API_NOT_FOUND.toString(), "none"));
+        underTest.get(api.getId(), user());
     }
 
     @Test(expected = ForbiddenException.class)
     public void givenUnauthorizedUser_getById_shouldThrowException() throws DemoException {
-        Integer id = 1;
-        when(apiDao.getById(id)).thenReturn(api());
-        underTest.get(id, unauthorizedUser());
+        Api api = api();
+        when(apiDao.getById(api.getId())).thenReturn(api);
+        underTest.get(api.getId(), unauthorizedUser());
     }
 
     @Test

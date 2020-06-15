@@ -44,7 +44,7 @@ public class ApiServiceImpl implements ApiService {
     @Override
     public Api get(Integer id, User user) throws DemoException {
         Api api = apiDao.getById(id);
-        validateAccess(user, api.getPublisher());
+        validateReadAccess(user, api.getPublisher());
         return api;
     }
 
@@ -60,7 +60,7 @@ public class ApiServiceImpl implements ApiService {
 
     private Api doUpsert(Integer id, ApiRequestDTO dto, User user) throws DemoException {
         Publisher publisher = publisherService.getById(dto.getPublisherId());
-        validateAccess(user, publisher);
+        validateWriteAccess(user, publisher);
         Api api = (id == null) ? new Api() : get(id, user);
         api.setCreatedOn((id == null) ? new Date() : api.getCreatedOn());
         api.setUpdatedOn(new Date());
@@ -78,8 +78,15 @@ public class ApiServiceImpl implements ApiService {
         apiDao.delete(id);
     }
 
-    private void validateAccess(User user, Publisher publisher) throws ForbiddenException {
+    private void validateReadAccess(User user, Publisher publisher) throws ForbiddenException {
         if (BusinessType.PRIVATE.equals(publisher.getBusinessType()) && !user.getPublisherIds().contains(publisher.getId())) {
+            LOGGER.warn("User {} doesn’t have permission to view {}", user.getUserId(), publisher.getId());
+            throw new ForbiddenException(ErrorCode.PUBLISHER_UNAUTHORIZED.toString(), "User doesn’t have permission to view publisher");
+        }
+    }
+
+    private void validateWriteAccess(User user, Publisher publisher) throws ForbiddenException {
+        if (!user.getPublisherIds().contains(publisher.getId())) {
             LOGGER.warn("User {} doesn’t belong to given publisher {}", user.getUserId(), publisher.getId());
             throw new ForbiddenException(ErrorCode.PUBLISHER_UNAUTHORIZED.toString(), "User doesn’t belong to given publisher");
         }
