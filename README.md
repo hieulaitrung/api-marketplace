@@ -55,7 +55,7 @@ To build output jar into Docker container
 
 	docker build .
 
-To run whole system in docker-compose env
+To run whole system in docker-compose env(including `Newman` sanity check)
 	
 	docker-compose up
 

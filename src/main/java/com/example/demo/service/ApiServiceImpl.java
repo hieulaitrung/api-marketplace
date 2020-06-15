@@ -74,7 +74,8 @@ public class ApiServiceImpl implements ApiService {
 
     @Override
     public void delete(Integer id, User user) throws DemoException {
-        get(id, user);
+        Api api = apiDao.getById(id);
+        validateWriteAccess(user, api.getPublisher());
         apiDao.delete(id);
     }
 

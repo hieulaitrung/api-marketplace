@@ -1,0 +1,660 @@
+{
+	"info": {
+		"_postman_id": "94cf48ad-f12d-4139-a25c-fdee4fce6d67",
+		"name": "Demo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Token create Api should be OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8f5f9e6d-25eb-4955-96e2-85892baedf4b",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"response body is valid\", function () {",
+							"    pm.response.to.be.withBody;",
+							"    var body = pm.response.json();",
+							"    ",
+							"    pm.expect(body.id).to.be.a('number');",
+							"    pm.expect(body.publisherId).to.be.equal(parseInt(pm.variables.get(\"publisherId\")));",
+							"    pm.variables.set(\"id\", pm.response.json().id);",
+							"    setTimeout(function(){}, 500);",
+							"    ",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "a8968bea-d6a2-40ae-9450-a993ba73f785",
+						"exec": [
+							"var name =  \"Api \" + new Date().getTime(); ",
+							"pm.variables.set(\"name\", name);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"description\": \"string\",\n  \"doc\": \"string\",\n  \"name\": \"{{name}}\",\n  \"publisherId\": {{publisherId}}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/apis",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"apis"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Token create private Api should be OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "cc0cde79-2a5a-48cf-920d-f4e43f81904f",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"response body is valid\", function () {",
+							"    pm.response.to.be.withBody;",
+							"    var body = pm.response.json();",
+							"    ",
+							"    pm.expect(body.id).to.be.a('number');",
+							"    pm.expect(body.publisherId).to.be.equal(parseInt(pm.variables.get(\"privatePublisherId\")));",
+							"    pm.variables.set(\"privateId\", pm.response.json().id);",
+							"    setTimeout(function(){}, 500);",
+							"    ",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "cbe4b210-1d9e-44a6-8a8b-eeab8f462a62",
+						"exec": [
+							"var privateName =  \"Api \" + new Date().getTime(); ",
+							"pm.variables.set(\"privateName\", privateName);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"description\": \"string\",\n  \"doc\": \"string\",\n  \"name\": \"{{privateName}}\",\n  \"publisherId\": {{privatePublisherId}}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/apis",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"apis"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Token get created Api should be OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9875a027-8ac9-4fd7-b83a-b0d9d1d05b26",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response body is valid\", function () {",
+							"    pm.response.to.be.withBody;",
+							"    var body = pm.response.json();",
+							"    ",
+							"    pm.expect(body.id).to.be.equal(parseInt(pm.variables.get(\"id\")));",
+							"    pm.expect(body.publisherId).to.be.equal(parseInt(pm.variables.get(\"publisherId\")));",
+							"    ",
+							"    ",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/apis/{{id}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"apis",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "No token get created Api should be NOK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7207a4dc-0b3c-4f2a-9978-6425eb3eb5d7",
+						"exec": [
+							"pm.test(\"response is nok\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test(\"response body is invalid token\", function () {",
+							"    pm.response.to.be.withBody;",
+							"    var body = pm.response.json();",
+							"    ",
+							"    pm.expect(body.errorCode).to.be.equal(\"TOKEN_INVALID\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/apis/{{id}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"apis",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Expired token get created Api should be NOK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "46d6700f-e9a1-4b06-a8e3-a652c08df1f1",
+						"exec": [
+							"pm.test(\"response is nok\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test(\"response body is invalid token\", function () {",
+							"    pm.response.to.be.withBody;",
+							"    var body = pm.response.json();",
+							"    ",
+							"    pm.expect(body.errorCode).to.be.equal(\"TOKEN_EXPIRED\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{expiredToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/apis/{{id}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"apis",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Unauthorized token get created Api should be NOK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c617e8b0-30b1-4617-b4bc-8656d3fb3fae",
+						"exec": [
+							"pm.test(\"response is nok\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							"",
+							"pm.test(\"response body is invalid token\", function () {",
+							"    pm.response.to.be.withBody;",
+							"    var body = pm.response.json();",
+							"    ",
+							"    pm.expect(body.errorCode).to.be.equal(\"TOKEN_UNAUTHORIZED\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{unauthorizedToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/apis/{{id}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"apis",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Invalid publishers token get created Api should be NOK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "907b429b-9435-4d50-b065-bb686bd7fd89",
+						"exec": [
+							"pm.test(\"response is nok\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							"",
+							"pm.test(\"response body is invalid token\", function () {",
+							"    pm.response.to.be.withBody;",
+							"    var body = pm.response.json();",
+							"    ",
+							"    pm.expect(body.errorCode).to.be.equal(\"PUBLISHER_UNAUTHORIZED\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{invalidToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/apis/{{privateId}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"apis",
+						"{{privateId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Token query by name for created API should be OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c48e7197-aa2e-4814-9079-73192d9d4ae4",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response body contains both apis\", function () {",
+							"    pm.response.to.be.withBody;",
+							"    var body = pm.response.json();",
+							"    pm.expect(body.total).to.be.above(1);",
+							"",
+							"    var apis = body.apis;",
+							"    var api = apis.filter(element => element.id == pm.variables.get(\"id\"));",
+							"    pm.expect(api).to.be.not.empty;",
+							"",
+							"    var privateApi = apis.filter(element => element.id == pm.variables.get(\"privateId\"));",
+							"    pm.expect(privateApi).to.be.not.empty;",
+							"    ",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/apis?term=Api ",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"apis"
+					],
+					"query": [
+						{
+							"key": "term",
+							"value": "Api "
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Invalid publishers token query by name for created API should be OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "244c1978-b9cb-4a89-879b-a047922905d1",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response body contains api only\", function () {",
+							"    pm.response.to.be.withBody;",
+							"    var body = pm.response.json();",
+							"    pm.expect(body.total).to.be.above(0);",
+							"",
+							"    var apis = body.apis;",
+							"    var api = apis.filter(element => element.id == pm.variables.get(\"id\"));",
+							"    pm.expect(api).to.be.not.empty;",
+							"",
+							"    var privateApi = apis.filter(element => element.id == pm.variables.get(\"privateId\"));",
+							"    pm.expect(privateApi).to.be.empty;",
+							"    ",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{invalidToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/apis?term=Api ",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"apis"
+					],
+					"query": [
+						{
+							"key": "term",
+							"value": "Api "
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Invalid token delete API should be NOK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d896d1c1-a4eb-47e4-9932-1de7d98122c8",
+						"exec": [
+							"pm.test(\"response is nok\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							"",
+							"pm.test(\"response body is invalid token\", function () {",
+							"    pm.response.to.be.withBody;",
+							"    var body = pm.response.json();",
+							"    ",
+							"    pm.expect(body.errorCode).to.be.equal(\"PUBLISHER_UNAUTHORIZED\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{invalidToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/apis/{{id}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"apis",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Token delete API should be OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a270043f-14d8-43c4-ae21-f3128f5f9e77",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/apis/{{id}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"apis",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User delete private API should be OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c14bbb46-3ffb-4833-acdb-eafb435b2d3b",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/apis/{{privateId}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"apis",
+						"{{privateId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
