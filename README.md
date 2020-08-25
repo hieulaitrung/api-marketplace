@@ -3,10 +3,10 @@
 Demo service for APIPortal apis platform
 
 What you need
-	* JDK 1.8
-	* Maven 3.2+
-	* Docker & Docker-compose
-	* Node & npm (for script to generate jwt token)
+* JDK 1.8
+* Maven 3.2+
+* Docker & Docker-compose
+* Node & npm (for script to generate jwt token)
 
 ## Run
 To run the application
