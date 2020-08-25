@@ -41,10 +41,10 @@ Note: separating test profile is to keep test cases running on dev machine as fa
 
 ## Configuration & Migration
 Configuration files are located in src/main/resource
-	* db: liquibase changelogs
-	* es: mapping for api indices (need to be configured at indices creating time)
-	* application-{env}.properties: application config
-	* logback.xml: config logging
+* db: liquibase changelogs
+* es: mapping for api indices (need to be configured at indices creating time)
+* application-{env}.properties: application config
+* logback.xml: config logging
 
 ## Package
 To package an application
